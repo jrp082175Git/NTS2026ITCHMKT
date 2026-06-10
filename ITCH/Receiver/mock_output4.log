@@ -1,0 +1,6 @@
+
+> receiver@1.0.0 mock
+> node test/mockServer.js
+
+Mock server listening on 127.0.0.1:21000
+Terminated

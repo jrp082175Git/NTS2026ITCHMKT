@@ -1,0 +1,30 @@
+{
+  "PROD": {
+    "itch": { "host": "127.0.0.1", "port": 21000 },
+    "glimpse": { "host": "127.0.0.1", "port": 21100 }
+  },
+  "DR": {
+    "itch": { "host": "127.0.0.1", "port": 21000 },
+    "glimpse": { "host": "127.0.0.1", "port": 21100 }
+  },
+  "credentials": {
+    "username": "USER  ",
+    "password": "PASSWORD  "
+  },
+  "soupbintcp": {
+    "clientHeartbeatIntervalMs": 1000,
+    "serverSilenceTimeoutMs": 15000,
+    "loginResponseTimeoutMs": 30000,
+    "reconnectDelayMs": 3000
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "password": null,
+    "db": 0,
+    "keyPrefix": "itch:receiver:"
+  },
+  "logging": {
+    "directory": "./logs"
+  }
+}
