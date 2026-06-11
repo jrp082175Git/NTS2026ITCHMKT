@@ -3,14 +3,14 @@ const endianness = require('../endianness');
 const encoders = {
   // 'L'
   encodeLoginRequest: (username, password, requestedSession, requestedSequenceNumber) => {
-    const payloadLen = 46; // 1 + 6 + 10 + 10 + 20 - 1 (type is 1)
+    const payloadLen = 47; // 1 (type) + 6 (username) + 10 (password) + 10 (session) + 20 (seq) = 47
     const buf = Buffer.alloc(2 + payloadLen);
     endianness.writeUInt16(buf, payloadLen, 0);
     buf.write('L', 2, 1, 'ascii');
-    endianness.writeAlpha(buf, username, 3, 6);
-    endianness.writeAlpha(buf, password, 9, 10);
-    endianness.writeAlpha(buf, requestedSession, 19, 10);
-    endianness.writeAlpha(buf, requestedSequenceNumber.toString().padStart(20, ' '), 29, 20); // Sequence number is ASCII numeric, left-padded per spec usually, but prompt says "Requested Sequence Number (offset 29, len 20, ASCII numeric; 1 for fresh start; 0 means 'start at most recent')" and "Login Request: ... Requested Session ... left-padded with spaces". We pad right or left. We left-pad sequence, and Requested Session left-padded. Oh wait, "Requested Session (offset 19, len 10, blanks to join the currently active session, or a specific session ID left-padded with spaces)".
+    buf.write(username.padEnd(6, ' '), 3, 6, 'ascii');
+    buf.write(password.padEnd(10, ' '), 9, 10, 'ascii');
+    buf.write(requestedSession.padStart(10, ' '), 19, 10, 'ascii'); // right aligned / left padded per spec
+    buf.write(requestedSequenceNumber.toString().padStart(20, ' '), 29, 20, 'ascii'); // right aligned / left padded numeric
     return buf;
   },
   // 'R'
