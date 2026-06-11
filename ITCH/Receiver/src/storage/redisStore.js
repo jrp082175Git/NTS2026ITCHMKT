@@ -6,7 +6,6 @@ class RedisStore {
   constructor() {
     const config = loadConfig().redis;
     const url = `redis://${config.password ? `:${config.password}@` : ''}${config.host}:${config.port}/${config.db}`;
-
     this.client = createClient({ url });
     this.keyPrefix = config.keyPrefix;
 
