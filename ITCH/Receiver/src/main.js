@@ -69,6 +69,7 @@ async function main() {
 
   client.on('message', async (data) => {
     const decoded = parser.parse(data.payload);
+    decoded.sequenceNumber = data.sequenceNumber;
     const record = {
       seq: data.sequenceNumber,
       msgType: decoded.msgType,

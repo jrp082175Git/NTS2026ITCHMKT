@@ -113,8 +113,37 @@ class SoupBinTCPClient extends EventEmitter {
       }
     } else {
       if (packet.type === 'S') {
-        this.emit('message', { sequenceNumber: this.sequenceNumber, payload: packet.messageBuffer });
-        this.sequenceNumber++;
+        const payload = packet.messageBuffer;
+        let offset = 0;
+
+        // PSE ITCH specification states a Sequenced Data packet can contain multiple message blocks,
+        // each prefixed with a 2-byte message length.
+        while (offset < payload.length) {
+          if (offset + 2 > payload.length) {
+            // Not enough bytes for length prefix, treat the rest as raw payload if it's the start
+            if (offset === 0) {
+               this.emit('message', { sequenceNumber: this.sequenceNumber, payload });
+               this.sequenceNumber++;
+            }
+            break;
+          }
+
+          const msgLen = payload.readUInt16BE(offset);
+
+          if (msgLen === 0 || offset + 2 + msgLen > payload.length) {
+             // Invalid length or spans beyond payload, fallback to treating whole payload as one message if offset is 0
+             if (offset === 0) {
+               this.emit('message', { sequenceNumber: this.sequenceNumber, payload });
+               this.sequenceNumber++;
+             }
+             break;
+          }
+
+          const msgPayload = payload.slice(offset + 2, offset + 2 + msgLen);
+          this.emit('message', { sequenceNumber: this.sequenceNumber, payload: msgPayload });
+          this.sequenceNumber++;
+          offset += 2 + msgLen;
+        }
       } else if (packet.type === 'Z') {
         logger.info("End of Session received");
         this.emit('endOfSession');
